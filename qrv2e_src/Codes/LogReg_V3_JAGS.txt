@@ -1,0 +1,31 @@
+model{
+	#Group Priors
+	muintercept ~ dnorm(0,1/(priorSD*priorSD))
+	muwV1 ~ dnorm(0,1/(priorSD*priorSD))
+	muwV2 ~ dnorm(0,1/(priorSD*priorSD))
+	muwV3 ~ dnorm(0,1/(priorSD*priorSD))
+	sigmaintercept ~ dnorm(0,1/(priorSD*priorSD))I(0,)
+	sigmawV1 ~ dnorm(0,1/(priorSD*priorSD))I(0,)
+	sigmawV2 ~ dnorm(0,1/(priorSD*priorSD))I(0,)
+	sigmawV3 ~ dnorm(0,1/(priorSD*priorSD))I(0,)
+	
+	#Reparameterize Group Priors
+	lambdaintercept <- 1/(sigmaintercept*sigmaintercept)
+	lambdawV1 <- 1/(sigmawV1*sigmawV1)
+	lambdawV2 <- 1/(sigmawV2*sigmawV2)
+	lambdawV3 <- 1/(sigmawV3*sigmawV3)
+
+	#Subject Priors
+	for (s in 1:nsubj){
+		intercept[subj[s]] ~ dnorm(muintercept,lambdaintercept)
+		wV1[subj[s]] ~ dnorm(muwV1,lambdawV1)
+		wV2[subj[s]] ~ dnorm(muwV2,lambdawV2)
+		wV3[subj[s]] ~ dnorm(muwV3,lambdawV3)		
+	}
+
+	#Model
+	for (n in 1:N){
+		logit(probabilityofC[n]) = intercept[S[n]] + wV1[S[n]]*V1[n] + wV2[S[n]]*V2[n] + wV3[S[n]]*V3[n]
+		C[n] ~ dbern(probabilityofC[n]);
+		}
+}

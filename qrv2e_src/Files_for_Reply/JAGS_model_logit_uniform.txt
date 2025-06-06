@@ -1,0 +1,21 @@
+model{
+	#Group Priors
+	r_sH ~ dunif(0,100)
+	l_sH ~ dunif(0,100)
+
+	#Subject Priors
+	for (s in 1:nsubj){
+		sH[subj[s]] ~ dgamma(r_sH,l_sH)
+	}
+
+	#Model
+	for (n in 1:N){
+		M1[n] = V1[n]/sH[S[n]]
+		M2[n] = V2[n]/sH[S[n]]
+		M3[n] = V3[n]/sH[S[n]]
+		p[n,1] = exp(M1[n])/(exp(M1[n])+exp(M2[n])+exp(M3[n]))
+		p[n,2] = exp(M2[n])/(exp(M1[n])+exp(M2[n])+exp(M3[n]))
+		p[n,3] = 1-p[n,1]-p[n,2]
+		C[n] ~ dcat(p[n,1:3])
+		}
+}
